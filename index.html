@@ -104,18 +104,12 @@
         };
 
         saveBtn.onclick = async () => {
-            console.log('Export button clicked');
-            const combinedBlob = new Blob(recordedBlobs, { type: 'video/webm' });
+            const blob = new Blob(recordedBlobs, { type: 'video/webm' });
             await ffmpeg.load();
-            console.log('FFmpeg loaded');
-            ffmpeg.FS('writeFile', 'input.webm', await fetchFile(combinedBlob));
-            console.log('File written to FS');
+            ffmpeg.FS('writeFile', 'input.webm', await fetchFile(blob));
             await ffmpeg.run('-i', 'input.webm', '-c:v', 'copy', '-strict', 'experimental', 'output.mp4');
-            console.log('FFmpeg command executed');
             const data = ffmpeg.FS('readFile', 'output.mp4');
-            console.log('File read from FS');
-            const mp4Blob = new Blob([data.buffer], { type: 'video/mp4' });
-            const url = window.URL.createObjectURL(mp4Blob);
+            const url = window.URL.createObjectURL(new Blob([data.buffer], { type: 'video/mp4' }));
             const a = document.createElement('a');
             a.style.display = 'none';
             a.href = url;
@@ -126,7 +120,6 @@
                 document.body.removeChild(a);
                 window.URL.revokeObjectURL(url);
             }, 100);
-            console.log('Download initiated');
         };
 
         init();
