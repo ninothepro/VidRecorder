@@ -68,9 +68,11 @@
         let saveBtn = document.getElementById('saveBtn');
         let mediaRecorder;
         let recordedBlobs = [];
+        let stream;
 
-        navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-            .then(stream => {
+        async function init() {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
                 video.srcObject = stream;
                 mediaRecorder = new MediaRecorder(stream);
                 mediaRecorder.ondataavailable = event => {
@@ -81,10 +83,10 @@
                 mediaRecorder.onstop = () => {
                     saveBtn.style.display = 'block';
                 };
-            })
-            .catch(error => {
+            } catch (error) {
                 console.error('Error accessing media devices.', error);
-            });
+            }
+        }
 
         startStopBtn.onclick = () => {
             if (mediaRecorder.state === 'recording') {
@@ -111,7 +113,8 @@
                 window.URL.revokeObjectURL(url);
             }, 100);
         };
+
+        init();
     </script>
 </body>
 </html>
-
