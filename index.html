@@ -48,12 +48,6 @@
         .button:active {
             background-color: rgba(255, 255, 255, 0.5);
         }
-        .button.save {
-            background-color: rgba(0, 255, 0, 0.3);
-        }
-        .button.save:active {
-            background-color: rgba(0, 255, 0, 0.5);
-        }
     </style>
 </head>
 <body>
@@ -62,26 +56,21 @@
         <button id="startStopBtn" class="button">●</button>
         <button id="saveBtn" class="button save" style="display:none;">💾</button>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.10.1/dist/ffmpeg.min.js"></script>
     <script>
-        const { createFFmpeg, fetchFile } = FFmpeg;
-        const ffmpeg = createFFmpeg({ log: true, corePath: 'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.10.1/dist/ffmpeg-core.js' });
-
         let video = document.getElementById('video');
         let startStopBtn = document.getElementById('startStopBtn');
         let saveBtn = document.getElementById('saveBtn');
         let mediaRecorder;
-        let recordedBlobs = [];
-        let stream;
+        let recordedChunks = [];
 
         async function init() {
             try {
-                stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
                 video.srcObject = stream;
-                mediaRecorder = new MediaRecorder(stream);
+                mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/mp4' });
                 mediaRecorder.ondataavailable = event => {
                     if (event.data && event.data.size > 0) {
-                        recordedBlobs.push(event.data);
+                        recordedChunks.push(event.data);
                     }
                 };
                 mediaRecorder.onstop = () => {
@@ -97,26 +86,16 @@
                 mediaRecorder.stop();
                 startStopBtn.textContent = '▶';
             } else {
+                recordedChunks = [];
                 mediaRecorder.start();
                 startStopBtn.textContent = '⏸';
                 saveBtn.style.display = 'none';
             }
         };
 
-        saveBtn.onclick = async () => {
-            console.log('Export button clicked');
-            const blob = new Blob(recordedBlobs, { type: 'video/webm' });
-            console.log('Blob created:', blob);
-            await ffmpeg.load();
-            console.log('FFmpeg loaded');
-            ffmpeg.FS('writeFile', 'input.webm', await fetchFile(blob));
-            console.log('File written to FS');
-            await ffmpeg.run('-i', 'input.webm', '-c:v', 'copy', '-strict', 'experimental', 'output.mp4');
-            console.log('FFmpeg command executed');
-            const data = ffmpeg.FS('readFile', 'output.mp4');
-            console.log('File read from FS:', data);
-            const url = window.URL.createObjectURL(new Blob([data.buffer], { type: 'video/mp4' }));
-            console.log('URL created:', url);
+        saveBtn.onclick = () => {
+            const blob = new Blob(recordedChunks, { type: 'video/mp4' });
+            const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.style.display = 'none';
             a.href = url;
@@ -127,7 +106,6 @@
                 document.body.removeChild(a);
                 window.URL.revokeObjectURL(url);
             }, 100);
-            console.log('Download initiated');
         };
 
         init();
