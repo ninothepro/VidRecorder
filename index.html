@@ -62,7 +62,11 @@
         <button id="startStopBtn" class="button">●</button>
         <button id="saveBtn" class="button save" style="display:none;">💾</button>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.10.1/dist/ffmpeg.min.js"></script>
     <script>
+        const { createFFmpeg, fetchFile } = FFmpeg;
+        const ffmpeg = createFFmpeg({ log: true });
+
         let video = document.getElementById('video');
         let startStopBtn = document.getElementById('startStopBtn');
         let saveBtn = document.getElementById('saveBtn');
@@ -100,8 +104,13 @@
         };
 
         saveBtn.onclick = async () => {
-            const blob = new Blob(recordedBlobs, { type: 'video/mp4' });
-            const url = window.URL.createObjectURL(blob);
+            const combinedBlob = new Blob(recordedBlobs, { type: 'video/webm' });
+            await ffmpeg.load();
+            ffmpeg.FS('writeFile', 'input.webm', await fetchFile(combinedBlob));
+            await ffmpeg.run('-i', 'input.webm', 'output.mp4');
+            const data = ffmpeg.FS('readFile', 'output.mp4');
+            const mp4Blob = new Blob([data.buffer], { type: 'video/mp4' });
+            const url = window.URL.createObjectURL(mp4Blob);
             const a = document.createElement('a');
             a.style.display = 'none';
             a.href = url;
