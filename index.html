@@ -65,7 +65,16 @@
     <script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.10.1/dist/ffmpeg.min.js"></script>
     <script>
         const { createFFmpeg, fetchFile } = FFmpeg;
-        const ffmpeg = createFFmpeg({ log: true });
+        const ffmpeg = createFFmpeg({
+            log: true,
+            env: {
+                USE_PTHREADS: 1,
+                WASM_ASYNC_COMPILATION: 0,
+                NO_INITIAL_RUN: 1,
+                TOTAL_MEMORY: 33554432,
+                FAST_MEMORY: 2097152,
+            }
+        });
 
         let video = document.getElementById('video');
         let startStopBtn = document.getElementById('startStopBtn');
@@ -125,7 +134,8 @@
             a.click();
             setTimeout(() => {
                 document.body.removeChild(a);
-                window.URL.revokeObjectURL(url);
+                window.URL.revokeObject
+            URL(url);
             }, 100);
             console.log('Download initiated');
         };
