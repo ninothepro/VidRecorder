@@ -56,7 +56,7 @@
         <button id="startStopBtn" class="button">●</button>
         <button id="saveBtn" class="button save" style="display:none;">💾</button>
     </div>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mux.js/6.0.0/mux.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.11.6"></script>
     <script>
         let video = document.getElementById('video');
         let startStopBtn = document.getElementById('startStopBtn');
@@ -69,7 +69,7 @@
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
                 video.srcObject = stream;
-                mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
+                mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm; codecs=vp8,opus' });
                 mediaRecorder.ondataavailable = event => {
                     if (event.data && event.data.size > 0) {
                         recordedBlobs.push(event.data);
@@ -96,41 +96,33 @@
             }
         };
 
-        saveBtn.onclick = () => {
-            const superBuffer = new Blob(recordedBlobs, { type: 'video/webm' });
-            convertToMp4(superBuffer);
+        saveBtn.onclick = async () => {
+            const { createFFmpeg, fetchFile } = FFmpeg;
+            const ffmpeg = createFFmpeg({ log: true });
+            await ffmpeg.load();
+
+            const webmBlobs = recordedBlobs.map((blob, index) => {
+                const fileName = `input${index}.webm`;
+                ffmpeg.FS('writeFile', fileName, new Uint8Array(await blob.arrayBuffer()));
+                return fileName;
+            });
+
+            await ffmpeg.run('-i', 'concat:' + webmBlobs.join('|'), '-c', 'copy', 'output.mp4');
+
+            const data = ffmpeg.FS('readFile', 'output.mp4');
+            const mp4Blob = new Blob([data.buffer], { type: 'video/mp4' });
+            const url = window.URL.createObjectURL(mp4Blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.download = 'recorded_video.mp4';
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(() => {
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+            }, 100);
         };
-
-        async function convertToMp4(blob) {
-            const reader = new FileReader();
-            reader.onload = async function(event) {
-                const webmBuffer = new Uint8Array(event.target.result);
-                const remuxer = new muxjs.mp4.Transmuxer();
-                const mp4Buffers = [];
-
-                remuxer.on('data', segment => {
-                    mp4Buffers.push(segment.initSegment);
-                    mp4Buffers.push(segment.data);
-                });
-
-                remuxer.push(webmBuffer);
-                remuxer.flush();
-
-                const mp4Blob = new Blob(mp4Buffers, { type: 'video/mp4' });
-                const url = window.URL.createObjectURL(mp4Blob);
-                const a = document.createElement('a');
-                a.style.display = 'none';
-                a.href = url;
-                a.download = 'recorded_video.mp4';
-                document.body.appendChild(a);
-                a.click();
-                setTimeout(() => {
-                    document.body.removeChild(a);
-                    window.URL.revokeObjectURL(url);
-                }, 100);
-            };
-            reader.readAsArrayBuffer(blob);
-        }
 
         init();
     </script>
