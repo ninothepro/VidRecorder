@@ -56,7 +56,6 @@
         <button id="startStopBtn" class="button">●</button>
         <button id="saveBtn" class="button save" style="display:none;">💾</button>
     </div>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mux.js/6.0.0/mux.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.11.6"></script>
     <script>
         let video = document.getElementById('video');
@@ -70,7 +69,7 @@
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
                 video.srcObject = stream;
-                mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm;codecs=vp8,opus' });
+                mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm; codecs=vp8' });
                 mediaRecorder.ondataavailable = event => {
                     if (event.data && event.data.size > 0) {
                         recordedBlobs.push(event.data);
