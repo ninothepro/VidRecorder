@@ -3,135 +3,95 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Video Recorder</title>
+    <title>Beautify</title>
     <style>
-        body, html {
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f0f0;
             margin: 0;
             padding: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-end;
-            background-color: black;
-            color: white;
-            font-family: 'Helvetica Neue', sans-serif;
         }
-        video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
         }
-        .controls {
-            display: flex;
-            justify-content: space-around;
-            width: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            padding: 10px 0;
-            position: absolute;
-            bottom: 0;
+        .song-list {
+            list-style: none;
+            padding: 0;
         }
-        .button {
-            background-color: rgba(255, 255, 255, 0.3);
-            border: none;
-            border-radius: 50%;
-            width: 60px;
-            height: 60px;
+        .song-item {
             display: flex;
             align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 24px;
-            color: white;
+            background-color: #fff;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
-        .button:active {
-            background-color: rgba(255, 255, 255, 0.5);
+        .album-cover {
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            margin-right: 10px;
+        }
+        .song-title {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        .song-artist {
+            color: #666;
+        }
+        .player {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .player img {
+            width: 300px;
+            height: 300px;
+            border-radius: 15px;
+            margin-bottom: 10px;
+        }
+        .player audio {
+            width: 100%;
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
-    <video id="video" autoplay muted playsinline></video>
-    <div class="controls">
-        <button id="startStopBtn" class="button">●</button>
-        <button id="saveBtn" class="button save" style="display:none;">💾</button>
+    <div class="container">
+        <h1>Beautify</h1>
+        <ul class="song-list">
+            <li class="song-item" onclick="playSong('kalojairi.mp3', 'Kalojairi', 'https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/cc/0a/2f/cc0a2f40-82b5-be5a-23e3-c938bc43360f/artwork.jpg/1200x1200bf-60.jpg')">
+                <img src="https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/cc/0a/2f/cc0a2f40-82b5-be5a-23e3-c938bc43360f/artwork.jpg/1200x1200bf-60.jpg" alt="Kalojairi" class="album-cover">
+                <div>
+                    <div class="song-title">Kalojairi</div>
+                </div>
+            </li>
+            <li class="song-item" onclick="playSong('kyriaki_tou_paska.mp3', 'KYRIAKH TOU PASKA', 'https://i.scdn.co/image/ab67616d00001e0203c07bcb62b61e3cd0ee65d1')">
+                <img src="https://i.scdn.co/image/ab67616d00001e0203c07bcb62b61e3cd0ee65d1" alt="KYRIAKH TOU PASKA" class="album-cover">
+                <div>
+                    <div class="song-title">KYRIAKH TOU PASKA</div>
+                </div>
+            </li>
+        </ul>
+        <div class="player" id="player">
+            <img id="albumCover" src="" alt="Album Cover">
+            <div id="nowPlaying" class="song-title"></div>
+            <audio id="audioPlayer" controls>
+                <source id="audioSource" src="" type="audio/mpeg">
+                Your browser does not support the audio element.
+            </audio>
+        </div>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.11.6"></script>
     <script>
-        let video = document.getElementById('video');
-        let startStopBtn = document.getElementById('startStopBtn');
-        let saveBtn = document.getElementById('saveBtn');
-        let mediaRecorder;
-        let recordedBlobs = [];
-        let isRecording = false;
-
-        async function init() {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-                video.srcObject = stream;
-                mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm; codecs=vp8' });
-                mediaRecorder.ondataavailable = event => {
-                    if (event.data && event.data.size > 0) {
-                        recordedBlobs.push(event.data);
-                    }
-                };
-                mediaRecorder.onstop = () => {
-                    saveBtn.style.display = 'block';
-                };
-            } catch (error) {
-                console.error('Error accessing media devices.', error);
-            }
+        function playSong(fileName, title, albumCover) {
+            document.getElementById('nowPlaying').textContent = title;
+            document.getElementById('albumCover').src = albumCover;
+            document.getElementById('audioSource').src = fileName;
+            document.getElementById('audioPlayer').load();
+            document.getElementById('audioPlayer').play();
         }
-
-        startStopBtn.onclick = () => {
-            if (isRecording) {
-                mediaRecorder.stop();
-                startStopBtn.textContent = '●';
-                isRecording = false;
-            } else {
-                mediaRecorder.start();
-                startStopBtn.textContent = '⏸';
-                saveBtn.style.display = 'none';
-                isRecording = true;
-            }
-        };
-
-        saveBtn.onclick = async () => {
-            const { createFFmpeg, fetchFile } = FFmpeg;
-            const ffmpeg = createFFmpeg({ log: true });
-            await ffmpeg.load();
-
-            // Write each recorded blob as a file
-            for (let i = 0; i < recordedBlobs.length; i++) {
-                ffmpeg.FS('writeFile', `input${i}.webm`, await fetchFile(recordedBlobs[i]));
-            }
-
-            // Create a file list text file for concatenation
-            const concatFileContent = recordedBlobs.map((_, i) => `file input${i}.webm`).join('\n');
-            ffmpeg.FS('writeFile', 'concat.txt', concatFileContent);
-
-            // Concatenate the recorded segments into an MP4 file
-            await ffmpeg.run('-f', 'concat', '-safe', '0', '-i', 'concat.txt', '-c', 'copy', 'output.mp4');
-
-            // Read the output MP4 file
-            const data = ffmpeg.FS('readFile', 'output.mp4');
-            const mp4Blob = new Blob([data.buffer], { type: 'video/mp4' });
-
-            // Download the MP4 file
-            const url = window.URL.createObjectURL(mp4Blob);
-            const a = document.createElement('a');
-            a.style.display = 'none';
-            a.href = url;
-            a.download = 'recorded_video.mp4';
-            document.body.appendChild(a);
-            a.click();
-            setTimeout(() => {
-                document.body.removeChild(a);
-                window.URL.revokeObjectURL(url);
-            }, 100);
-        };
-
-        init();
     </script>
 </body>
 </html>
