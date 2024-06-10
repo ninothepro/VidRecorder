@@ -37,6 +37,15 @@
             width: 100%;
             margin-top: 10px;
         }
+        .back-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -50,6 +59,7 @@
                 Your browser does not support the audio element.
             </audio>
         </div>
+        <button class="back-button" onclick="goBack()">Back</button>
     </div>
     <script>
         function getQueryParams() {
@@ -60,6 +70,10 @@
                 artist: params.get('artist'),
                 albumCover: params.get('albumCover')
             };
+        }
+
+        function goBack() {
+            window.history.back();
         }
 
         document.addEventListener('DOMContentLoaded', () => {
