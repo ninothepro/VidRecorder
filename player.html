@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beautify - Player</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+        }
+        .player img {
+            width: 300px;
+            height: 300px;
+            border-radius: 15px;
+            margin-bottom: 10px;
+        }
+        .song-title {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .player audio {
+            width: 100%;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="song-title" id="nowPlaying">Song Title</h1>
+        <div class="player">
+            <img id="albumCover" src="" alt="Album Cover">
+            <audio id="audioPlayer" controls>
+                <source id="audioSource" src="" type="audio/mpeg">
+                Your browser does not support the audio element.
+            </audio>
+        </div>
+    </div>
+    <script>
+        function getQueryParams() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                fileName: params.get('fileName'),
+                title: params.get('title'),
+                albumCover: params.get('albumCover')
+            };
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const { fileName, title, albumCover } = getQueryParams();
+            document.getElementById('nowPlaying').textContent = title;
+            document.getElementById('albumCover').src = albumCover;
+            document.getElementById('audioSource').src = fileName;
+            document.getElementById('audioPlayer').load();
+        });
+    </script>
+</body>
+</html>
