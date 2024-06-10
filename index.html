@@ -28,6 +28,7 @@
             margin: 10px 0;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
         }
         .album-cover {
             width: 50px;
@@ -39,58 +40,29 @@
             font-size: 1.2em;
             font-weight: bold;
         }
-        .song-artist {
-            color: #666;
-        }
-        .player {
-            margin-top: 20px;
-            text-align: center;
-        }
-        .player img {
-            width: 300px;
-            height: 300px;
-            border-radius: 15px;
-            margin-bottom: 10px;
-        }
-        .player audio {
-            width: 100%;
-            margin-top: 10px;
-        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Beautify</h1>
         <ul class="song-list">
-            <li class="song-item" onclick="playSong('kalojairi.mp3', 'Kalojairi', 'https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/cc/0a/2f/cc0a2f40-82b5-be5a-23e3-c938bc43360f/artwork.jpg/1200x1200bf-60.jpg')">
+            <li class="song-item" onclick="openPlayer('kalojairi.mp3', 'Kalojairi', 'https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/cc/0a/2f/cc0a2f40-82b5-be5a-23e3-c938bc43360f/artwork.jpg/1200x1200bf-60.jpg')">
                 <img src="https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/cc/0a/2f/cc0a2f40-82b5-be5a-23e3-c938bc43360f/artwork.jpg/1200x1200bf-60.jpg" alt="Kalojairi" class="album-cover">
                 <div>
                     <div class="song-title">Kalojairi</div>
                 </div>
             </li>
-            <li class="song-item" onclick="playSong('kyriaki_tou_paska.mp3', 'KYRIAKH TOU PASKA', 'https://i.scdn.co/image/ab67616d00001e0203c07bcb62b61e3cd0ee65d1')">
+            <li class="song-item" onclick="openPlayer('kyriaki_tou_paska.mp3', 'KYRIAKH TOU PASKA', 'https://i.scdn.co/image/ab67616d00001e0203c07bcb62b61e3cd0ee65d1')">
                 <img src="https://i.scdn.co/image/ab67616d00001e0203c07bcb62b61e3cd0ee65d1" alt="KYRIAKH TOU PASKA" class="album-cover">
                 <div>
                     <div class="song-title">KYRIAKH TOU PASKA</div>
                 </div>
             </li>
         </ul>
-        <div class="player" id="player">
-            <img id="albumCover" src="" alt="Album Cover">
-            <div id="nowPlaying" class="song-title"></div>
-            <audio id="audioPlayer" controls>
-                <source id="audioSource" src="" type="audio/mpeg">
-                Your browser does not support the audio element.
-            </audio>
-        </div>
     </div>
     <script>
-        function playSong(fileName, title, albumCover) {
-            document.getElementById('nowPlaying').textContent = title;
-            document.getElementById('albumCover').src = albumCover;
-            document.getElementById('audioSource').src = fileName;
-            document.getElementById('audioPlayer').load();
-            document.getElementById('audioPlayer').play();
+        function openPlayer(fileName, title, albumCover) {
+            window.location.href = `player.html?fileName=${encodeURIComponent(fileName)}&title=${encodeURIComponent(title)}&albumCover=${encodeURIComponent(albumCover)}`;
         }
     </script>
 </body>
