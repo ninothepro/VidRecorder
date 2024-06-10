@@ -28,6 +28,11 @@
             font-weight: bold;
             margin-bottom: 10px;
         }
+        .song-artist {
+            font-size: 1.5em;
+            color: #666;
+            margin-bottom: 20px;
+        }
         .player audio {
             width: 100%;
             margin-top: 10px;
@@ -37,6 +42,7 @@
 <body>
     <div class="container">
         <h1 class="song-title" id="nowPlaying">Song Title</h1>
+        <div class="song-artist" id="artist">Artist</div>
         <div class="player">
             <img id="albumCover" src="" alt="Album Cover">
             <audio id="audioPlayer" controls>
@@ -51,13 +57,15 @@
             return {
                 fileName: params.get('fileName'),
                 title: params.get('title'),
+                artist: params.get('artist'),
                 albumCover: params.get('albumCover')
             };
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            const { fileName, title, albumCover } = getQueryParams();
+            const { fileName, title, artist, albumCover } = getQueryParams();
             document.getElementById('nowPlaying').textContent = title;
+            document.getElementById('artist').textContent = artist;
             document.getElementById('albumCover').src = albumCover;
             document.getElementById('audioSource').src = fileName;
             document.getElementById('audioPlayer').load();
