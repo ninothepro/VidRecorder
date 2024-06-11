@@ -7,7 +7,8 @@
     <style>
         body {
             font-family: 'Arial', sans-serif;
-            background-color: #f0f0f0;
+            background-color: #121212;
+            color: #fff;
             margin: 0;
             padding: 0;
         }
@@ -23,12 +24,16 @@
         .song-item {
             display: flex;
             align-items: center;
-            background-color: #fff;
+            background-color: #1e1e1e;
             padding: 10px;
             margin: 10px 0;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .song-item:hover {
+            background-color: #333;
         }
         .album-cover {
             width: 50px;
@@ -45,7 +50,7 @@
             font-weight: bold;
         }
         .song-artist {
-            color: #666;
+            color: #b3b3b3;
         }
     </style>
 </head>
