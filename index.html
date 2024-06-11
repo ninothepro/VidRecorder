@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VibeStream</title>
+    <title>Beautify</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -75,4 +75,14 @@
                 <div class="song-info">
                     <div class="song-title">KYRIAKH TOU PASKA</div>
                     <div class="song-artist">WazGucci Stone</div>
-                </
+                </div>
+            </li>
+        </ul>
+    </div>
+    <script>
+        function openPlayer(fileName, title, artist, albumCover) {
+            window.location.href = `player.html?fileName=${encodeURIComponent(fileName)}&title=${encodeURIComponent(title)}&artist=${encodeURIComponent(artist)}&albumCover=${encodeURIComponent(albumCover)}`;
+        }
+    </script>
+</body>
+</html>
